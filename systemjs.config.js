@@ -12,11 +12,11 @@
 
     '@angular':                   'https://npmcdn.com/@angular', // sufficient if we didn't pin the version
     'angular2-in-memory-web-api': 'https://npmcdn.com/angular2-in-memory-web-api', // get latest
-    '@ngrx/store':                'https://raw.githubusercontent.com/MikeRyan52/store/core-refactor/src',
-    '@ngrx/effects':                'https://raw.githubusercontent.com/ngrx/effects/master/lib',
-    '@ngrx/core':                 'https://raw.githubusercontent.com/ngrx/core/master/lib',
+     '@ngrx': 'https://npmcdn.com/@ngrx',
+    '@ngrx/store':                'https://npmcdn.com/@ngrx/store@2.0.0',
+    '@ngrx/effects':              'https://npmcdn.com/@ngrx/effects@1.0.1',
+    '@ngrx/core':                 'https://npmcdn.com/@ngrx/core@1.0.0',
     'rxjs':                       'https://npmcdn.com/rxjs@5.0.0-beta.6',
-    'socket.io-client':                  'https://npmcdn.com/socket.io-client@1.4.6/socket.io.js',
     'ts':                         'https://npmcdn.com/plugin-typescript@4.0.10/lib/plugin.js',
     'typescript':                 'https://npmcdn.com/typescript@1.8.10/lib/typescript.js'
  };
@@ -24,11 +24,10 @@
   //packages tells the System loader how to load when no filename and/or no extension
   var packages = {
     'app':                        { main: 'main.ts',  defaultExtension: 'ts' },
-    'rxjs':                       { defaultExtension: 'js' },
-    'socket.io-client ':                  { defaultExtension: 'js' },
-    '@ngrx/core':                { main: 'index', defaultExtension: 'ts' },
-    '@ngrx/store':                { main: 'index', defaultExtension: 'ts' },
-    '@ngrx/effects':                { main: 'index', defaultExtension: 'ts' },
+    'rxjs':                       { main: 'index.js', defaultExtension: 'js' },
+    '@ngrx/store':                       { main:'index.js', defaultExtension: 'js' },
+    '@ngrx/effects':                       { main: 'index.js', defaultExtension: 'js' },
+    '@ngrx/core':                       { defaultExtension: 'js' },
     'angular2-in-memory-web-api': { defaultExtension: 'js' },
   };
 
