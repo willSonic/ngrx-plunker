@@ -9,10 +9,9 @@
   //map tells the System loader where to look for things
   var  map = {
     'app':                        'app',
-
     '@angular':                   'https://npmcdn.com/@angular', // sufficient if we didn't pin the version
     'angular2-in-memory-web-api': 'https://npmcdn.com/angular2-in-memory-web-api', // get latest
-     '@ngrx': 'https://npmcdn.com/@ngrx',
+     '@ngrx':                     'https://npmcdn.com/@ngrx',
     '@ngrx/store':                'https://npmcdn.com/@ngrx/store@2.0.0',
     '@ngrx/effects':              'https://npmcdn.com/@ngrx/effects@1.0.1',
     '@ngrx/core':                 'https://npmcdn.com/@ngrx/core@1.0.0',
@@ -23,12 +22,12 @@
 
   //packages tells the System loader how to load when no filename and/or no extension
   var packages = {
-    'app':                        { main: 'main.ts',  defaultExtension: 'ts' },
+    'app':                        { main: 'main.browser.ts',  defaultExtension: 'ts' },
     'rxjs':                       { main: 'index.js', defaultExtension: 'js' },
     '@ngrx/store':                       { main:'index.js', defaultExtension: 'js' },
     '@ngrx/effects':                       { main: 'index.js', defaultExtension: 'js' },
     '@ngrx/core':                       { defaultExtension: 'js' },
-    'angular2-in-memory-web-api': { defaultExtension: 'js' },
+    'angular2-in-memory-web-api': { defaultExtension: 'js' }
   };
 
   var ngPackageNames = [
@@ -61,6 +60,7 @@
 
   var config = {
     // DEMO ONLY! REAL CODE SHOULD NOT TRANSPILE IN THE BROWSER
+      defaultJSExtensions: false,
     transpiler: 'typescript',
     typescriptOptions: {
       emitDecoratorMetadata: true

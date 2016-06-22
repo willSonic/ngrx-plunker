@@ -1,37 +1,56 @@
-
-import {Reducer, Action} from "@ngrx/store";
-export const ADD_AUDIOITEM_TO_PLAYLIST = 'ADD_AUDIOITEM_TO_PLAYLIST';
-export const UPDATE_AUDIOITEM_IN_PLAYLIST ='UPDATE_AUDIOITEM_IN_PLAYLIST';
-
-export interface IPlaylist { audioList:any[] }
-
-const initialState: IPlaylist = { audioList:[] }
+import '@ngrx/core/add/operator/select';
+import 'rxjs/add/operator/map';
+import { Observable } from 'rxjs/Observable';
+import { Action } from '@ngrx/store';
+import { AudioItem } from '../models';
+import { PlayListActions } from '../actions';
 
 
-export const playlist: Reducer<IPlaylist> = (state: IPlaylist = initialState, action: Action) => {
-    switch (action.type) {
-        case ADD_AUDIOITEM_TO_PLAYLIST :
-            if(state.audioList.indexOf(action.payload)  < 0){
-
-                state = Object.assign({},
-                    state,
-                    {audioList:[ ...state.audioList, Object.assign({},action.payload)]});
-
-            }
-            return state;
-
-        case UPDATE_AUDIOITEM_IN_PLAYLIST :
-               return  Object.assign({}, state, {
-                              audioList: state.audioList.map(audioItem => {
-                                if (audioItem.id === action.payload.id) {
-                                   return Object.assign({}, audioItem, {
-                                            isPlaying: action.payload.isPlaying
-                                          });
-                                }
-                                return audioItem
-                              })
-                          });
-        default:
-            return state;
-    }
+export interface PlayListState {
+    audioItemList:AudioItem[]
 };
+
+const initialState: PlayListState = {
+    audioItemList: []
+};
+
+
+export default function(state = initialState, action: Action): PlayListState {
+    switch (action.type) {
+        case PlayListActions.ADD_AUDIOITEM:{
+            const audioItem: AudioItem  = action.payload;
+            if (state.audioItemList.includes(audioItem)) {
+                return state;
+            }
+            return Object.assign({}, state, {
+                audioTrackList: [ ...state.audioItemList, audioItem ]
+            });
+        }
+        case PlayListActions.REMOVE_AUDIOITEM:{
+            const audioItemToRemove: AudioItem  = action.payload;
+
+            return Object.assign({}, state, {
+                audioTrackList: state.audioItemList.filter(audioItem => audioItem.id !== audioItemToRemove.id)
+            });
+        }
+        case PlayListActions.ADD_AUDIOITEM_LIST:{
+            const audioItems: AudioItem[]  = action.payload;
+
+
+            return Object.assign({}, state, {
+                audioTrackList: [ ...state.audioItemList, ...audioItems ]
+            });
+        }
+        default: {
+            return state;
+        }
+    }
+}
+
+
+export function getAudioItemList() {
+    return (state$: Observable<PlayListState>) => state$
+        .select(s => s.audioItemList);
+};
+
+
