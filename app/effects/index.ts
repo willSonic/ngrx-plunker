@@ -1,4 +1,4 @@
-import { AudioArtistEffects } from './audioartistEffect';
+import { AudioArtistEffects } from './audioArtistEffects';
 
 export default [
   AudioArtistEffects

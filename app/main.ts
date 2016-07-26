@@ -1,31 +1,23 @@
-/*import { Component, Output, Input } from '@angular/core';
-import { MdAnchor, MdButton } from '@angular2-material/button';
-import { MdToolbar } from '@angular2-material/toolbar';
-import { MD_SIDENAV_DIRECTIVES } from '@angular2-material/sidenav';
-import { MdIcon, MdIconRegistry } from '@angular2-material/icon';
-import { MD_LIST_DIRECTIVES } from '@angular2-material/list';
+import { provideStore, Store } from '@ngrx/store';
+import { provide, Input, Directive,HostBinding } from '@angular/core';
+import { runEffects } from '@ngrx/effects';
+import { Component, Injectable, Output, Input} from '@angular/core';
 
-import {MATERIAL_DIRECTIVES } from 'ng2-material';*/
+import { AudioItemServices } from './services/audioItemServices';
+import { AppState,AudioItemState, getAudioArtists, getAudioAlbums, getAudioItems, getAudioItemState } from './reducers/index';
+import { AudioArtistListComponent, AudioArtistsInput } from './components/audioArtistListComponent';
+import { AudioAlbumListComponent, AudioAlbumsInput } from './components/audioAlbumListComponent';
+import { AudioItemListComponent, AudioItemsInput } from './components/audioItemListComponent';
 
-
-import 'rxjs/Rx';
-import { Http} from '@angular/http';
-import { Component, Injectable} from '@angular/core';
-import { Observable} from 'rxjs/Rx';
-import { Store } from '@ngrx/store';
-import { StateUpdates, Effect } from '@ngrx/effects';
-import 'rxjs/Rx';
-import {Component, Injectable} from '@angular/core';
-import {bootstrap} from '@angular/platform-browser-dynamic';
-import {Observable} from 'rxjs/Rx';
-import {provideStore, Store, Dispatcher} from '@ngrx/store';
-import { StateUpdates, Effect, runEffects } from '@ngrx/effects'
-const LOAD = 'LOAD';
-const LOADED = 'LOADED';
 
 
 @Component({
     selector: 'app',
+    directives: [
+      AudioArtistListComponent,
+      AudioAlbumListComponent,
+      AudioItemListComponent
+      ],
     styles:[`
     *{font-family: Monaco, Consolas;}
     a{
@@ -40,9 +32,13 @@ const LOADED = 'LOADED';
       display: flex;
       flex-direction: column;
     }
+    .headline{
+      color:#2aa4c9;
+      padding-left:10px;
+    }
     `],
     template: `
-                <div class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
+                <div mdl class="demo-layout mdl-layout mdl-js-layout mdl-layout--fixed-drawer mdl-layout--fixed-header">
                   <header class="demo-header mdl-layout__header mdl-color--grey-100 mdl-color-text--grey-600">
                     <div class="mdl-layout__header-row">
                       <span class="mdl-layout-title">NGRX Harness For Plunker</span>
@@ -50,66 +46,49 @@ const LOADED = 'LOADED';
                   </header>
                   <main class="mdl-layout__content mdl-color--grey-12">
                        <div class="mdl-grid">
-                          <div class="demo-graphs mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--5-col"> 
-                                <svg fill="currentColor" viewBox="0 0 300 250" class="demo-graph">
-                                  <use xlink:href="#chart" />
-                                </svg>
+                          <div class="demo-graphs mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--5-col">
+                               <h5 class="headline"> List of Artists</h5>
+                               <audioartist-list [audioArtists]="audioArtists$ | async"
+                                                  class="demo-list-icon mdl-list"></audioartist-list>
                           </div>
                           <div class="demo-graphs mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--5-col"> 
-                                <svg fill="currentColor" viewBox="0 0 300 250" class="demo-graph">
-                                  <use xlink:href="#chart" />
-                                </svg>       
+                               <h5 class="headline">List of Albums</h5>     
+                               <audioalbum-list [audioAlbums]="audioAlbums$ | async"
+                                                  class="demo-list-icon mdl-list"></audioalbum-list> 
+                         </div>
+                          <div class="demo-graphs mdl-shadow--2dp mdl-color--white mdl-cell mdl-cell--5-col"> 
+                               <h5 class="headline">List of Audio Items</h5>     
+                               <audioitems-list [audioItems]="audioItems$ | async"
+                                                 (changeState)="changeStateOfAudioItem($event)"
+                                                  class="demo-list-icon mdl-list"></audioitems-list> 
                          </div>
                         </div>
                   </main>
                 </div>
               `
 })
-export default  class App {
-    results$;
+export default class App{
 
-    load(payload){
-        this.store.dispatch({type: LOAD, payload});
-    };
+  audioArtists$: Observable<AudioArtistsInput>;
+  audioAlbums$: Observable<AudioAlbumsInput>;
+  audioItems$: Observable<AudioItemsInput>;
+  audioItemState$: Observable<AudioItemState>;
+  
+  
 
-    constructor(private store:Store) {
-        this.results$ = this.store.select('questions');
-    }
+  constructor(private store: Store<AppState>, private audioItemServices:AudioItemServices) {
+       this.audioArtists$      = store.let(getAudioArtists());
+       this.audioAlbums$       = store.let(getAudioAlbums());
+       this.audioItems$        = store.let(getAudioItems());
+       this.audioItemState$    = store.let(getAudioItemState());
+       this.audioItems$.subscribe(state =>{
+             console.log("[Main.ts] ----App---  this.audioItems$.subscribe state =",state);
+             });
+  }
 
-    ngOnInit(){
-        this.store.dispatch({type: LOAD, payload:'rxjs'});
-    }
+  changeStateOfAudioItem(audioItem:AudioItem){
+             this.audioItemServices.updateAudioItemState(audioItem);
+  }
+
+  
 }
-
-//reducers
-export const questions = (state = [], {type, payload})=> {
-    console.log(type)
-    switch (type) {
-        case LOADED:
-            return payload.items;
-
-        default:
-            return state;
-    }
-};
-
-//effects
-@Injectable()
-export class StackExchangeEffects {
-    url$ = Observable.of('https://api.stackexchange.com/2.2/search?site=stackoverflow');
-
-    constructor(private http: Http, private updates$: StateUpdates) { }
-
-    @Effect() load$ = this.updates$
-        .whenAction(LOAD)
-        .combineLatest(this.url$, ({action:{payload}}, url)=> `${url}&intitle=${payload}`)
-        .switchMap(url => http.get(url))
-        .map(res => ({
-                type: LOADED,
-                payload: res.json()
-            })
-        )
-        .do(v=> console.log(v))
-}
-
- //App {}

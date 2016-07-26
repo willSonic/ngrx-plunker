@@ -1,8 +1,11 @@
 export interface AudioItem {
     id:string;
-    artistId:number;
-    artistAudioBuffer: ArrayBuffer;
+    audioAlbumId:string;
+    albumImgSrc:string;
+    trackURL:string;
+    artistAudioBuffer:ArrayBuffer;
     downloadComplete:boolean;
+    loadProgress:number;
     isPlaying:boolean;
     currentPosition:number;
 }

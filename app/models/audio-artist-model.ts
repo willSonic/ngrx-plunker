@@ -1,7 +1,7 @@
-export interface AudioArtist {
-    id: number;
-    artistName: string;
-    trackTitle: string;
-    albumImgSrc: string;
+export interface AudioArtist{
+    id:string;
+    artistName:string;
+    trackTitle:string;
+    albumImgSrc:string;
     trackURL:string;
-}
+};

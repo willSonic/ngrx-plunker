@@ -1,0 +1,107 @@
+from Gitter conversation with @nosachamos
+
+
+Yes, @pmulac suggestion is the way to go - create a service to dispatch actions 
+and to select slices of your state from the store - store.select('whatever)', 
+then inject the service where actions should be dispatched, and use the 
+service to obtain references to the observables that deliver data from the 
+store.
+
+The effects should not be injecting the store. Instead, when something needs 
+to be handled by the effects, your service will dispatch an action with perhaps
+something in the payload, and the effect will handle that 
+(by filtering with whenAction) so normally you have some actions handled by
+reducers (the result of effects and otehr actions that have no side effects, 
+like setting data directly to the store, e.g. user selected something), and some
+by effects (the ones that require an ajax call, or local storage, etc)
+so you inject the store in y our services, and in most cases, only there.. 
+then inject your service where data is needed, or actions should be dispatched
+your pattern of having action creators also works, but you still need the 
+service to select that data from the store to keep things clear.. 
+and I would suggest moving action creation into the service as well, 
+so you only access one thing to do both, but that's just my preference.
+
+
+@willSonic there are many ways to go about it, but I usually have a service 
+per feature. For example, if my app allows to manage contacts and users, 
+then I'd have a ContactsService, a UsersService and maybe a AuthService. 
+The ContactsService would give you the observables related to contacts, and 
+dispatch actions to create, remote, update, etc.. same for users, and the 
+auth one would do things like login and logout.
+
+This way if another dev needs to perform actions with a given model, 
+they just inject the service for that and all actions and observables
+are available in one place
+
+MY QUESTION
+so do you place all your actions for Contacts in ContactService or 
+just the ones that you know will need to be used with effects
+
+
+
+Eduardo Born @nosachamos 10:03
+where to place them is really a matter of preference but I do keep all together
+
+in older apps I had them in the service
+then I moved them to a module within the reducer
+like
+export module ContactActions {
+   export const ACITON1 = 'blabla';
+   export const ACITON2 = 'blabla';
+   export const ACITON3 = 'blabla';
+}
+then I just import ContactActions and get a nice code completion there
+
+Will Streeter @willSonic 10:05
+ah.. nice and so you eventually just import this action module into both 
+service and reducer... by chance you wouldn't have github, 
+gist you could point me to
+
+Eduardo Born @nosachamos 10:05
+the ContactService imports this module, and dispatches the actions within it
+exactly I do have one, let me find it
+
+
+Eduardo Born @nosachamos 10:07
+I did it here
+https://github.com/nosachamos/ng2-rc1-ngrx2-demo/tree/master/src/client
+Its not a complete app, and won't run for you given that it calls an API that
+is not open but you can at least see what I'm saying there...
+its just one more example, so you add to the mix haha
+
+Will Streeter @willSonic 10:08
+I was comparing what you were saying at the beginning of the conversation
+with async-example previous version where a decision is made in actions module 
+for discerning whether to get more reddit post
+
+Eduardo Born @nosachamos 10:08
+https://github.com/nosachamos/ng2-rc1-ngrx2-demo/blob/master/src/client/services/databases/databases.service.ts
+
+Will Streeter @willSonic 10:08
+awesome thankyou so much
+
+Eduardo Born @nosachamos 10:08
+this is a service designed like I mentioned above
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
